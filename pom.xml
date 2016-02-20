@@ -71,7 +71,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>com.selau.thoughtworks.railroad.Main</mainClass>
+							<mainClass>com.selau.booking.Solution</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
