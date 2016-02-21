@@ -102,10 +102,14 @@ public class Solution {
 			final Map<Node, Integer> calculatedDijkstra = calculateDijkstra(roadsNetwork, firstLocation);
 			
 			for (Entry<Node, Integer> route : calculatedDijkstra.entrySet()) {
-				final Integer directDistance = distances.get(new RoadConnection(firstLocation, route.getKey()));
+				final Node destination = route.getKey();
+				final Integer directDistance = distances.get(new RoadConnection(firstLocation, destination));
 				final int routeDistance = route.getValue().intValue();
 				
-				if (((directDistance == null) || (directDistance < routeDistance)) && (routeDistance < leastDistanceWith2Hops)) {
+				if (((directDistance == null) || (directDistance.intValue() < routeDistance)) 
+						&& (routeDistance < leastDistanceWith2Hops)
+						&& (! firstLocation.equals(destination))) {
+					
 					leastDistanceWith2Hops = routeDistance;
 				}
 			}
@@ -124,14 +128,14 @@ public class Solution {
 
         shortestDistances.put(source, NO_DISTANCE);
 
-        final EvaluatedNodeWrapper evaluatedSourceNode = new EvaluatedNodeWrapper(source, NO_DISTANCE);
+        final EvaluatedNodeWrapper evaluatedSourceNode = new EvaluatedNodeWrapper(source, NO_DISTANCE, NO_DISTANCE, false);
         evaluatedNodesMap.put(source, evaluatedSourceNode);
         priorityQueue.add(evaluatedSourceNode);
 
         for (final Node node : graph.nodes()) {
             if (! node.equals(source)) {
 
-                final EvaluatedNodeWrapper evaluatedNode = new EvaluatedNodeWrapper(node, INFINITE_DISTANCE);
+                final EvaluatedNodeWrapper evaluatedNode = new EvaluatedNodeWrapper(node, INFINITE_DISTANCE, INFINITE_DISTANCE, true);
 
                 evaluatedNodesMap.put(node, evaluatedNode);
                 shortestDistances.put(node, INFINITE_DISTANCE);
@@ -146,7 +150,8 @@ public class Solution {
             if (leastDistanceNode.distance() == INFINITE_DISTANCE)
                 break;
 
-            final Set<Node> neighbors = graph.neighbors(leastDistanceNode.node());
+            final Node currentNode = leastDistanceNode.node();
+			final Set<Node> neighbors = graph.neighbors(currentNode);
             if ((neighbors == null) || (neighbors.isEmpty()))
                 continue;
 
@@ -158,16 +163,24 @@ public class Solution {
                 final EvaluatedNodeWrapper evaluatedNeighborNode = evaluatedNodesMap.get(neighbor);
 
                 if ((newNeighborDistance < evaluatedNeighborNode.distance())
-                        || (evaluatedNeighborNode.distance() == NO_DISTANCE)) {
+                        || (evaluatedNeighborNode.distance() == NO_DISTANCE)
+                        || (evaluatedNeighborNode.isDirectDistanceFromSource())) {
 
-                    final EvaluatedNodeWrapper newNeighborEvaluation = new EvaluatedNodeWrapper(neighbor, newNeighborDistance);
+                    EvaluatedNodeWrapper newNeighborEvaluation = null;
+                    
+                    if (currentNode.equals(source))
+                    	newNeighborEvaluation = new EvaluatedNodeWrapper(neighbor, newNeighborDistance, INFINITE_DISTANCE, true);
+                    else
+                    	newNeighborEvaluation = new EvaluatedNodeWrapper(neighbor, newNeighborDistance, newNeighborDistance, false);
+                    
                     evaluatedNodesMap.put(neighbor, newNeighborEvaluation);
 
                     final boolean neighborRemoved = priorityQueue.remove(evaluatedNeighborNode);
                     if (neighborRemoved)
                         priorityQueue.add(newNeighborEvaluation);
 
-                    shortestDistances.put(neighbor, Integer.valueOf(newNeighborDistance));
+                    if (! currentNode.equals(source))
+                    	shortestDistances.put(neighbor, Integer.valueOf(newNeighborDistance));
                 }
             }
         }
@@ -184,10 +197,15 @@ public class Solution {
 
         private final Node node;
         private final int distance;
+        private final int distanceWithHop;
+        private final boolean directDistanceFromSource;
+        
 
-        public EvaluatedNodeWrapper(final Node node, final int distance) {
+        public EvaluatedNodeWrapper(final Node node, final int distance, final int distanceWithHop, final boolean directDistanceFromSource) {
             this.node = node;
             this.distance = distance;
+            this.distanceWithHop = distanceWithHop;
+            this.directDistanceFromSource = directDistanceFromSource;
         }
 
         @Override
@@ -201,6 +219,14 @@ public class Solution {
 
         public int distance() {
             return distance;
+        }
+        
+        public boolean isDirectDistanceFromSource() {
+        	return directDistanceFromSource;
+        }
+        
+        public int distanceWithHop() {
+        	return distanceWithHop;
         }
 
         @Override
