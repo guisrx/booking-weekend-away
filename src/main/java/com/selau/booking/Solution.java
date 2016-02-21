@@ -1,8 +1,12 @@
 package com.selau.booking;
 
-import java.io.*;
-import java.util.*;
-
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.Set;
 
 /**
  *  Dijkstra's algorithm implementation using a priority queue based on
@@ -44,21 +48,72 @@ public class Solution {
         	final int locations = scanner.nextInt();
             final int roads = scanner.nextInt();
             
-            for (int road = 0; road < roads; road++) {
-            	final int source = scanner.nextInt();
-            	final int target = scanner.nextInt();
-            	final int distance = scanner.nextInt();
-            	
-            	System.out.println(source + " " + target + " " + distance);
-            }
+            final int leastDistanceWith2Hops = calculateLeastDistanceWith2Hops(scanner, locations, roads);
         	
+            System.out.println(leastDistanceWith2Hops);
         }
         scanner.close();
-
-        //System.out.println(ways);
     }
+
+	private static int calculateLeastDistanceWith2Hops(final Scanner scanner, final int locations, final int roads) {
+		final Set<Node> nodes = new HashSet<Node>();
+		final Node locationsArray[] = new Location[locations];
+		
+		for (int locationCount = 0; locationCount < locations; locationCount++) {
+			final Location location = new Location(Integer.toString(locationCount +1));
+			
+			locationsArray[locationCount] = location;
+			nodes.add(location);
+		}
+		
+		final Map<RoadConnection, Integer> distances = new HashMap<RoadConnection, Integer>();
+		final Map<Node, Set<Node>> adjacents = new HashMap<Node, Set<Node>>();
+		
+		for (int road = 0; road < roads; road++) {
+			final int source = scanner.nextInt();
+			final int target = scanner.nextInt();
+			final int distance = scanner.nextInt();
+			
+			final Node sourceNode = locationsArray[source-1];
+			final Node targetNode = locationsArray[target-1];
+			          	
+		    Set<Node> sourceNodeAdjacents = adjacents.get(sourceNode);
+		    if (sourceNodeAdjacents == null) {
+		    	sourceNodeAdjacents = new HashSet<Node>();
+		    	adjacents.put(sourceNode, sourceNodeAdjacents);
+		    }
+		    
+		    Set<Node> targetNodeAdjacents = adjacents.get(targetNode);
+		    if (targetNodeAdjacents == null) {
+		    	targetNodeAdjacents = new HashSet<Node>();
+		    	adjacents.put(targetNode, targetNodeAdjacents);
+		    }
+
+		    sourceNodeAdjacents.add(targetNode);
+		    targetNodeAdjacents.add(sourceNode);
+
+		    distances.put(new RoadConnection(sourceNode, targetNode), Integer.valueOf(distance));
+		    distances.put(new RoadConnection(targetNode, sourceNode), Integer.valueOf(distance));
+		}
+		final RoadsNetwork roadsNetwork = new RoadsNetwork(distances, adjacents, nodes);
+		int leastDistanceWith2Hops = INFINITE_DISTANCE;
+		
+		for (Node firstLocation : locationsArray) {
+			final Map<Node, Integer> calculatedDijkstra = calculateDijkstra(roadsNetwork, firstLocation);
+			
+			for (Entry<Node, Integer> route : calculatedDijkstra.entrySet()) {
+				final Integer directDistance = distances.get(new RoadConnection(firstLocation, route.getKey()));
+				final int routeDistance = route.getValue().intValue();
+				
+				if (((directDistance == null) || (directDistance < routeDistance)) && (routeDistance < leastDistanceWith2Hops)) {
+					leastDistanceWith2Hops = routeDistance;
+				}
+			}
+		}
+		return leastDistanceWith2Hops;
+	}
     
-    public static Map<Node, Integer> calculate(final RoadsNetwork graph, final Node source) {
+    public static Map<Node, Integer> calculateDijkstra(final RoadsNetwork graph, final Node source) {
 
         if ((graph == null) || (source == null))
             throw new IllegalArgumentException("Invalid null arguments for the algorithm.");
@@ -192,7 +247,7 @@ public class Solution {
 
     }
     
-    class RoadsNetwork {
+    static class RoadsNetwork {
 
         private final Map<RoadConnection, Integer> distances;
         private final Map<Node, Set<Node>> adjacents;
@@ -259,7 +314,7 @@ public class Solution {
 
     }
     
-    class RoadConnection {
+    static class RoadConnection {
 
         private final Node from;
         private final Node to;
@@ -311,6 +366,51 @@ public class Solution {
         @Override
         public String toString() {
             return "RoadConnection [from=" + from + ", to=" + to + "]";
+        }
+
+    }
+    
+    static class Location implements Node {
+
+        private final String name;
+
+        public Location(final String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String name() {
+            return this.name;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (!(obj instanceof Location))
+                return false;
+            Location other = (Location) obj;
+            if (name == null) {
+                if (other.name != null)
+                    return false;
+            } else if (!name.equals(other.name))
+                return false;
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "Location [name=" + name + "]";
         }
 
     }
