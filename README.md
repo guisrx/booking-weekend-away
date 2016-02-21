@@ -6,7 +6,7 @@ It doesn’t matter to Pete which locations he visits, as long as the total dist
 
 ## Note: ##
 
-* Pete can start and finish his route at any locations - **L_start**, **L_end** **∈ LL** as long as there is a route from **L_start** to **L_end**.
+* Pete can start and finish his route at any locations - **L_start**, **L_end** **∈ L** as long as there is a route from **L_start** to **L_end**.
 * Pete wants to minimize the total driving distance of his route.
 * Following his friends’ suggestions, Pete wants to visit at least 3 locations.
 
@@ -29,14 +29,23 @@ The first line contains integer **T**, **T** test-cases follow. The first line o
 
 ## Sample Input ##
 
-`1
+```
+1
+
 4 6
+
 1 2 2
+
 1 3 4
+
 1 4 8
+
 2 3 3
+
 2 4 3
-3 4 1`
+
+3 4 1
+```
 
 ## Sample Output ##
 
