@@ -18,13 +18,13 @@ The first line contains integer **T**, **T** test-cases follow. The first line o
 
 ## Constraints ##
 
-**1 <= T <= 101 <= T <= 10**
+**1 <= T <= 10**
 
-**3 <= N <= 1053 <= N <=105**
+**3 <= N <= 10^5**
 
-**2 <= M <= 4×1052 <= M <= 4×105**
+**2 <= M <= 4×10^5**
 
-**1 <= D <= 1001 <= D <= 100**
+**1 <= D <= 100**
 
 ## Output Format ##
 
