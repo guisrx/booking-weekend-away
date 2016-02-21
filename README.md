@@ -10,7 +10,7 @@ It doesn’t matter to Pete which locations he visits, as long as the total dist
 * Pete wants to minimize the total driving distance of his route.
 * Following his friends’ suggestions, Pete wants to visit at least 3 locations.
 
-Pete isn’t worried about the distance from his apartment to LstartLstart or the distance from LendLend back to his apartment, so you only need to minimize Pete’s driving distance between LstartLstart to LendLend.
+Pete isn’t worried about the distance from his apartment to **Lstart** or the distance from **Lend** back to his apartment, so you only need to minimize Pete’s driving distance between **Lstart** to **Lend**.
 
 ## Input Format ##
 
@@ -19,8 +19,11 @@ The first line contains integer **T**, **T** test-cases follow. The first line o
 ## Constraints ##
 
 **1 <= T <= 101 <= T <= 10**
+
 **3 <= N <= 1053 <= N <=105**
+
 **2 <= M <= 4×1052 <= M <= 4×105**
+
 **1 <= D <= 1001 <= D <= 100**
 
 ## Output Format ##
@@ -31,19 +34,12 @@ The first line contains integer **T**, **T** test-cases follow. The first line o
 
 ```
 1
-
 4 6
-
 1 2 2
-
 1 3 4
-
 1 4 8
-
 2 3 3
-
 2 4 3
-
 3 4 1
 ```
 
